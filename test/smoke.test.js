@@ -19,11 +19,15 @@ assert.ok(packageJson.repository.url.includes("OscarSanchezSavne/savne-saltcorn-
 assert.ok(packageJson.engines.saltcorn);
 assert.ok(fs.existsSync(path.join(__dirname, "..", "LICENSE")));
 assert.ok(fs.existsSync(path.join(__dirname, "..", "SECURITY.md")));
-assert.ok(
-  !fs
-    .readFileSync(path.join(__dirname, "..", "README.md"), "utf8")
-    .includes("10.0.100.4")
-);
+const privateInstanceAddress = ["10", "0", "100", "4"].join(".");
+for (const publicFile of ["README.md", "SKILL.md", "openapi.json"]) {
+  assert.ok(
+    !fs
+      .readFileSync(path.join(__dirname, "..", publicFile), "utf8")
+      .includes(privateInstanceAddress),
+    `${publicFile} must not include private instance addresses`
+  );
+}
 assert.strictEqual(plugin.documentation_url, undefined);
 assert.strictEqual(plugin.configuration_workflow, undefined);
 assert.ok(Array.isArray(plugin.routes));

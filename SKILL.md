@@ -55,7 +55,7 @@ the missing value before calling the API. If the user does not know how to get
 them, guide them:
 
 - Base URL: open Saltcorn in the browser and copy the origin, including protocol
-  and port, such as `http://10.0.100.4:3000`.
+  and port, such as `https://saltcorn.example.com`.
 - User token: log in as an admin Saltcorn user, open the user/profile or
   users/security area, and create or copy a user API token. The token must
   belong to an admin user for administrative operations.
@@ -63,7 +63,7 @@ them, guide them:
 ## Request Pattern
 
 `<SALTCORN_BASE_URL>` is the Saltcorn origin, for example
-`http://localhost:3000` or `http://10.0.100.4:3000`. Do not append plugin paths
+`http://localhost:3000` or `https://saltcorn.example.com`. Do not append plugin paths
 to the base URL. `<SALTCORN_USER_TOKEN>` is a native Saltcorn user API token.
 These are placeholders in examples, not required environment variable names.
 
