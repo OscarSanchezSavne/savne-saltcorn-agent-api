@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Savne Saltcorn Agent API",
-    "version": "0.2.54",
-    "description": "Authenticated administrative API for operating Saltcorn safely from agents, scripts, and automation tools. All public endpoints are served under /savne-saltcorn-agent-api."
+    "version": "0.2.55",
+    "description": "Authenticated administrative API for operating Saltcorn safely from agents, scripts, and automation tools. All endpoints are served under /savne-saltcorn-agent-api."
   },
   "servers": [
     {
@@ -33,7 +33,6 @@
         "tags": ["Discovery"],
         "summary": "Return this OpenAPI document",
         "operationId": "getOpenApiDocument",
-        "security": [],
         "responses": {
           "200": {
             "description": "OpenAPI document",
@@ -54,9 +53,8 @@
       "get": {
         "tags": ["Discovery"],
         "summary": "Show browser-friendly OpenAPI documentation",
-        "description": "Serves a public HTML page that loads Swagger UI and this plugin's OpenAPI JSON. Administrative operations shown in the contract still require a Saltcorn admin API token.",
+        "description": "Serves an authenticated HTML page that loads Swagger UI and this plugin's OpenAPI JSON. Access requires a Saltcorn admin API token.",
         "operationId": "getOpenApiDocs",
-        "security": [],
         "responses": {
           "200": {
             "description": "OpenAPI documentation page",

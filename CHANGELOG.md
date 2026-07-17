@@ -2,6 +2,11 @@
 
 All notable changes to `savne-saltcorn-agent-api` are documented here.
 
+## 0.2.55 - 2026-07-17
+
+- Protected Swagger UI and OpenAPI JSON behind Saltcorn user API token authentication.
+- Updated documentation and tests so discovery endpoints are authenticated, not public.
+
 ## 0.2.54 - 2026-07-17
 
 - Added public page creation support with explicit public role resolution.

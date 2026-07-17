@@ -38,6 +38,7 @@ assert.ok(urls.every((url) => !url.startsWith("/plugins/saltcorn-extension-api/"
 assert.ok(urls.every((url) => !url.startsWith("/plugins/savne-saltcorn-agent-api/")));
 const routeKeys = plugin.routes.map((route) => `${route.method.toUpperCase()} ${route.url}`);
 assert.strictEqual(new Set(routeKeys).size, routeKeys.length);
+const routeByUrl = (url) => plugin.routes.find((route) => route.url === url);
 assert.ok(urls.includes("/savne-saltcorn-agent-api/health"));
 assert.ok(urls.includes("/savne-saltcorn-agent-api/openapi.json"));
 assert.ok(urls.includes("/savne-saltcorn-agent-api/docs"));
@@ -101,6 +102,28 @@ Promise.resolve(requireExtensionAccess({}, { public: true })).then((user) => {
   assert.strictEqual(user, null);
 });
 
+const captureResponse = () => ({
+  statusCode: 200,
+  payload: undefined,
+  contentType: undefined,
+  status(code) {
+    this.statusCode = code;
+    return this;
+  },
+  json(payload) {
+    this.payload = payload;
+    return payload;
+  },
+  type(contentType) {
+    this.contentType = contentType;
+    return this;
+  },
+  send(payload) {
+    this.payload = payload;
+    return payload;
+  },
+});
+
 Promise.resolve(plugin.extension_api.openapi())
   .then((openapi) => {
     assert.strictEqual(openapi.openapi, "3.1.0");
@@ -111,14 +134,19 @@ Promise.resolve(plugin.extension_api.openapi())
     assert.ok(openapi.paths["/savne-saltcorn-agent-api/pages/public"]);
     assert.ok(openapi.paths["/savne-saltcorn-agent-api/triggers"]);
     assert.ok(openapi.paths["/savne-saltcorn-agent-api/triggers/webhook"]);
-    assert.deepStrictEqual(
-      openapi.paths["/savne-saltcorn-agent-api/openapi.json"].get.security,
-      []
-    );
-    assert.deepStrictEqual(
-      openapi.paths["/savne-saltcorn-agent-api/docs"].get.security,
-      []
-    );
+    assert.strictEqual(openapi.paths["/savne-saltcorn-agent-api/openapi.json"].get.security, undefined);
+    assert.strictEqual(openapi.paths["/savne-saltcorn-agent-api/docs"].get.security, undefined);
+    const openapiRes = captureResponse();
+    const docsRes = captureResponse();
+    return Promise.all([
+      routeByUrl("/savne-saltcorn-agent-api/openapi.json").callback({ headers: {} }, openapiRes),
+      routeByUrl("/savne-saltcorn-agent-api/docs").callback({ headers: {} }, docsRes),
+    ]).then(() => {
+      assert.strictEqual(openapiRes.statusCode, 401);
+      assert.strictEqual(docsRes.statusCode, 401);
+    });
+  })
+  .then(() => {
     console.log("savne-saltcorn-agent-api smoke test passed");
   })
   .catch((error) => {

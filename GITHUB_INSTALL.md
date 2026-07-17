@@ -28,7 +28,7 @@ After a Git tag exists, prefer the tag instead of `main`:
 Nombre: savne-saltcorn-agent-api
 Fuente: github
 Ubicacion: OscarSanchezSavne/savne-saltcorn-agent-api
-Version: v0.2.53
+Version: v0.2.55
 ```
 
 ## Local Fallback

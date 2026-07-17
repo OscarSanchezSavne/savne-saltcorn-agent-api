@@ -104,9 +104,9 @@ names, security, request bodies, dry-run behavior, and response shapes. Do not
 deduce endpoint URLs from memory or from Saltcorn conventions. If OpenAPI cannot
 be read, stop and report that the plugin documentation endpoint is unavailable.
 Use this skill as the operational playbook for sequencing and decision-making.
-The OpenAPI JSON and `/savne-saltcorn-agent-api/docs` are public discovery
-endpoints. Every administrative operation still requires an admin Saltcorn
-user API token.
+The OpenAPI JSON and `/savne-saltcorn-agent-api/docs` require the same admin
+Saltcorn user API token as the rest of the plugin. They are discovery endpoints,
+but they are not public.
 
 `GET /savne-saltcorn-agent-api/state` is the inventory endpoint. It returns the
 current `tables`, `views`, `pages`, `roles`, and `plugins`. To answer "what
@@ -608,4 +608,4 @@ Before reporting success:
 
 ## Package Identity
 
-The current package/plugin name is `savne-saltcorn-agent-api`. Do not install it alongside the old development package identity. This package exposes only `/savne-saltcorn-agent-api/...` public routes.
+The current package/plugin name is `savne-saltcorn-agent-api`. Do not install it alongside the old development package identity. This package exposes routes only under `/savne-saltcorn-agent-api/...`.

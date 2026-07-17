@@ -23,7 +23,7 @@ For a fixed release, use:
 Nombre: savne-saltcorn-agent-api
 Fuente: github
 Ubicacion: OscarSanchezSavne/savne-saltcorn-agent-api
-Version: v0.2.53
+Version: v0.2.55
 ```
 
 Do not put the full GitHub URL in `Nombre`. For Saltcorn's `github` source,
@@ -31,7 +31,8 @@ Do not put the full GitHub URL in `Nombre`. For Saltcorn's `github` source,
 
 ## Documentation
 
-After installing and restarting Saltcorn:
+After installing and restarting Saltcorn, open these authenticated endpoints with
+a Saltcorn admin user API token:
 
 ```text
 /savne-saltcorn-agent-api/docs
@@ -39,7 +40,8 @@ After installing and restarting Saltcorn:
 ```
 
 The OpenAPI contract is also included in this repository as `openapi.json`.
-Agent usage guidance is included as `SKILL.md`.
+Agent usage guidance is included as `SKILL.md`. The documentation routes are
+not public; they require the same Saltcorn user token as the administrative API.
 
 ## Security
 

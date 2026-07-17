@@ -428,8 +428,8 @@ const wrap = (handler, options = {}) =>
 const routeDefinitions = [
   ["get", `/${pluginName}/health`, health],
   ["get", `/${pluginName}/commands`, commandList],
-  ["get", openApiUrl, openapi, { public: true }],
-  ["get", documentationUrl, openapiDocs, { public: true }],
+  ["get", openApiUrl, openapi],
+  ["get", documentationUrl, openapiDocs],
   ["get", `/${pluginName}/state`, state],
   ["get", `/${pluginName}/viewtemplates`, viewtemplates],
   ["get", `/${pluginName}/fields/capabilities`, fieldCapabilities],
