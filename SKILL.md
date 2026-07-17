@@ -10,6 +10,10 @@ Use this skill to build or modify Saltcorn apps through the `savne-saltcorn-agen
 ## Core Rules
 
 - Use HTTP endpoints under `/savne-saltcorn-agent-api/...`.
+- Never guess, invent, or derive alternate API paths. Do not use `/api/...`,
+  `/plugins/...`, `/extension-api/...`, or raw Saltcorn routes for this plugin.
+- Build URLs as `$SALTCORN_BASE_URL` plus the exact path from this skill or
+  `/savne-saltcorn-agent-api/openapi.json`.
 - Authenticate with a native Saltcorn user API token: `Authorization: Bearer <saltcorn-user-api-token>`.
 - Do not use fixed shared tokens, cookies, or direct Saltcorn internal table writes.
 - Prefer Saltcorn-native tables, fields, views, pages, menus, and layout components.
@@ -21,35 +25,56 @@ Use this skill to build or modify Saltcorn apps through the `savne-saltcorn-agen
 
 ## Request Pattern
 
-Use JSON with explicit content type:
+`SALTCORN_BASE_URL` is only the Saltcorn origin, for example
+`http://localhost:3000` or `http://10.0.100.4:3000`. Do not append plugin paths
+to the base URL.
+
+For GET requests:
+
+```bash
+curl -sS \
+  -H "Authorization: Bearer $SALTCORN_USER_TOKEN" \
+  "$SALTCORN_BASE_URL/savne-saltcorn-agent-api/health"
+```
+
+For POST requests, use JSON with explicit content type:
 
 ```bash
 curl -sS \
   -H "Authorization: Bearer $SALTCORN_USER_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"dry_run":true}' \
-  "$SALTCORN_BASE_URL/savne-saltcorn-agent-api/health"
+  "$SALTCORN_BASE_URL/savne-saltcorn-agent-api/validate"
 ```
-
-For GET requests omit `-d`.
 
 ## Discovery First
 
-Start every session with:
+Start every session with these exact calls before creating or modifying
+anything:
 
 1. `GET /savne-saltcorn-agent-api/health`
 2. `GET /savne-saltcorn-agent-api/openapi.json`
-3. `GET /savne-saltcorn-agent-api/capabilities`
-4. `GET /savne-saltcorn-agent-api/fields/capabilities`
-5. `GET /savne-saltcorn-agent-api/viewtemplates`
-6. `GET /savne-saltcorn-agent-api/menus/inspect` when changing navigation
+3. `GET /savne-saltcorn-agent-api/state`
+4. `GET /savne-saltcorn-agent-api/capabilities`
+5. `GET /savne-saltcorn-agent-api/fields/capabilities`
+6. `GET /savne-saltcorn-agent-api/viewtemplates`
+7. `GET /savne-saltcorn-agent-api/menus/inspect` when changing navigation
 
-Use `/savne-saltcorn-agent-api/openapi.json` as the contract source for endpoint names,
-security, request bodies, dry-run behavior, and response shapes. Use this skill
-as the operational playbook for sequencing and decision-making.
+Use `/savne-saltcorn-agent-api/openapi.json` as the contract source for endpoint
+names, security, request bodies, dry-run behavior, and response shapes. Do not
+deduce endpoint URLs from memory or from Saltcorn conventions. If OpenAPI cannot
+be read, stop and report that the plugin documentation endpoint is unavailable.
+Use this skill as the operational playbook for sequencing and decision-making.
 The OpenAPI JSON and `/savne-saltcorn-agent-api/docs` are public discovery
 endpoints. Every administrative operation still requires an admin Saltcorn
 user API token.
+
+`GET /savne-saltcorn-agent-api/state` is the inventory endpoint. It returns the
+current `tables`, `views`, `pages`, `roles`, and `plugins`. To answer "what
+tables exist?", call `GET /savne-saltcorn-agent-api/state` and read
+`response.tables`. There is no separate `GET /savne-saltcorn-agent-api/tables`
+list endpoint in this version; `POST /savne-saltcorn-agent-api/tables` creates
+tables.
 
 Use `/savne-saltcorn-agent-api/capabilities/require` before optional plugin views:
 
@@ -84,6 +109,10 @@ Use this order unless the user asks for a narrow edit:
 - Do not rename internal table names just to translate UI labels.
 
 ## Tables
+
+List existing tables with `GET /savne-saltcorn-agent-api/state` and read
+`response.tables`. Do this before creating a table, before adding fields, and
+whenever the user asks what tables exist.
 
 Create tables with `POST /savne-saltcorn-agent-api/tables`.
 
