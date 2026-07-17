@@ -2,6 +2,11 @@
 
 All notable changes to `savne-saltcorn-agent-api` are documented here.
 
+## 0.2.56 - 2026-07-17
+
+- Allowed logged-in Saltcorn admin sessions to open Swagger UI and OpenAPI JSON in the browser.
+- Kept Swagger UI and OpenAPI JSON closed to anonymous users and available to agents through Bearer tokens.
+
 ## 0.2.55 - 2026-07-17
 
 - Protected Swagger UI and OpenAPI JSON behind Saltcorn user API token authentication.

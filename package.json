@@ -1,6 +1,6 @@
 {
   "name": "savne-saltcorn-agent-api",
-  "version": "0.2.55",
+  "version": "0.2.56",
   "description": "Administrative API for operating Saltcorn safely from agents, scripts, and automation tools.",
   "main": "index.js",
   "license": "MIT",

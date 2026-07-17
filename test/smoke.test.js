@@ -144,6 +144,23 @@ Promise.resolve(plugin.extension_api.openapi())
     ]).then(() => {
       assert.strictEqual(openapiRes.statusCode, 401);
       assert.strictEqual(docsRes.statusCode, 401);
+      const adminOpenapiRes = captureResponse();
+      const adminDocsRes = captureResponse();
+      return Promise.all([
+        routeByUrl("/savne-saltcorn-agent-api/openapi.json").callback(
+          { headers: {}, user: { role_id: 1 } },
+          adminOpenapiRes
+        ),
+        routeByUrl("/savne-saltcorn-agent-api/docs").callback(
+          { headers: {}, user: { role_id: 1 } },
+          adminDocsRes
+        ),
+      ]).then(() => {
+        assert.strictEqual(adminOpenapiRes.statusCode, 200);
+        assert.strictEqual(adminDocsRes.statusCode, 200);
+        assert.strictEqual(adminOpenapiRes.payload.openapi, "3.1.0");
+        assert.ok(String(adminDocsRes.payload).includes("SwaggerUIBundle"));
+      });
     });
   })
   .then(() => {

@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Savne Saltcorn Agent API",
-    "version": "0.2.55",
+    "version": "0.2.56",
     "description": "Authenticated administrative API for operating Saltcorn safely from agents, scripts, and automation tools. All endpoints are served under /savne-saltcorn-agent-api."
   },
   "servers": [
