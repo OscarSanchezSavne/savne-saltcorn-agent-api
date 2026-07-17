@@ -148,8 +148,8 @@ Use this order unless the user asks for a narrow edit:
 - Use Saltcorn's normal serial `id` primary key. Do not add a second id field unless the user asks.
 - For foreign keys, default to the referenced table singular plus `_id`:
   `product_id`, `employee_id`, `supplier_id`, `purchase_order_id`.
-- Use user-facing labels in the requested language.
-- For Spanish apps, use labels such as `Crear`, `Guardar`, `Editar`, `Eliminar`, `Productos`, `Proveedor`, `Calendario`.
+- Adapt all user-facing labels to the user's requested language, especially
+  form field labels, button labels, page titles, view titles, and menu labels.
 - Do not rename existing internal table or field names to match this convention unless the user explicitly asks.
 
 ## Tables
