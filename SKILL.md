@@ -12,7 +12,7 @@ Use this skill to build or modify Saltcorn apps through the `savne-saltcorn-agen
 - Use HTTP endpoints under `/savne-saltcorn-agent-api/...`.
 - Never guess, invent, or derive alternate API paths. Do not use `/api/...`,
   `/plugins/...`, `/extension-api/...`, or raw Saltcorn routes for this plugin.
-- Build URLs as `$SALTCORN_BASE_URL` plus the exact path from this skill or
+- Build URLs as `<SALTCORN_BASE_URL>` plus the exact path from this skill or
   `/savne-saltcorn-agent-api/openapi.json`.
 - Authenticate with a native Saltcorn user API token: `Authorization: Bearer <saltcorn-user-api-token>`.
 - Do not use fixed shared tokens, cookies, or direct Saltcorn internal table writes.
@@ -25,26 +25,37 @@ Use this skill to build or modify Saltcorn apps through the `savne-saltcorn-agen
 
 ## Request Pattern
 
-`SALTCORN_BASE_URL` is only the Saltcorn origin, for example
+`<SALTCORN_BASE_URL>` is the Saltcorn origin, for example
 `http://localhost:3000` or `http://10.0.100.4:3000`. Do not append plugin paths
-to the base URL.
+to the base URL. `<SALTCORN_USER_TOKEN>` is a native Saltcorn user API token.
+These are placeholders in examples, not required environment variable names.
+
+If the base URL or token is not known from the conversation or environment, ask
+the user for them before calling the API. If the user does not know how to get
+them, guide them:
+
+- Base URL: open Saltcorn in the browser and copy the origin, including protocol
+  and port, such as `http://10.0.100.4:3000`.
+- User token: log in as an admin Saltcorn user and create/copy a user API token
+  from Saltcorn's user/API-key settings. The token must belong to an admin user
+  for administrative operations.
 
 For GET requests:
 
 ```bash
 curl -sS \
-  -H "Authorization: Bearer $SALTCORN_USER_TOKEN" \
-  "$SALTCORN_BASE_URL/savne-saltcorn-agent-api/health"
+  -H "Authorization: Bearer <SALTCORN_USER_TOKEN>" \
+  "<SALTCORN_BASE_URL>/savne-saltcorn-agent-api/health"
 ```
 
 For POST requests, use JSON with explicit content type:
 
 ```bash
 curl -sS \
-  -H "Authorization: Bearer $SALTCORN_USER_TOKEN" \
+  -H "Authorization: Bearer <SALTCORN_USER_TOKEN>" \
   -H "Content-Type: application/json" \
   -d '{"dry_run":true}' \
-  "$SALTCORN_BASE_URL/savne-saltcorn-agent-api/validate"
+  "<SALTCORN_BASE_URL>/savne-saltcorn-agent-api/validate"
 ```
 
 ## Discovery First
