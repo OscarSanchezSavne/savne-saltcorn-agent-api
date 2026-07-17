@@ -1,0 +1,52 @@
+{
+  "name": "savne-saltcorn-agent-api",
+  "version": "0.2.53",
+  "description": "Administrative API for operating Saltcorn safely from agents, scripts, and automation tools.",
+  "main": "index.js",
+  "license": "MIT",
+  "author": "Savne <info@savne.net>",
+  "homepage": "https://savne.net",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OscarSanchezSavne/savne-saltcorn-agent-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/OscarSanchezSavne/savne-saltcorn-agent-api/issues",
+    "email": "info@savne.net"
+  },
+  "private": false,
+  "files": [
+    "index.js",
+    "lib",
+    "openapi.json",
+    "public",
+    "CHANGELOG.md",
+    "GITHUB_INSTALL.md",
+    "LICENSE",
+    "README.md",
+    "SECURITY.md",
+    "SKILL.md",
+    "package.json"
+  ],
+  "scripts": {
+    "test": "node test/smoke.test.js"
+  },
+  "keywords": [
+    "saltcorn",
+    "savne",
+    "plugin",
+    "api",
+    "ai",
+    "ia",
+    "agent",
+    "automation",
+    "admin",
+    "no-code",
+    "low-code"
+  ],
+  "dependencies": {},
+  "engines": {
+    "node": ">=20 <25",
+    "saltcorn": ">=1.6.0"
+  }
+}

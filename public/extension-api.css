@@ -1,0 +1,53 @@
+.tabulator {
+  width: 100% !important;
+  border-color: #d9dee7;
+  font-size: 0.95rem;
+}
+
+.tabulator .tabulator-header {
+  border-bottom: 1px solid #cfd6e0;
+  color: #374151;
+  font-weight: 500 !important;
+}
+
+.tabulator .tabulator-header .tabulator-header-contents,
+.tabulator .tabulator-header .tabulator-header-contents .tabulator-headers,
+.tabulator .tabulator-tableholder .tabulator-table {
+  min-width: 100% !important;
+  width: 100%;
+}
+
+.tabulator .tabulator-header .tabulator-col,
+.tabulator-row .tabulator-cell {
+  border-right-color: #e5e7eb !important;
+}
+
+.tabulator .tabulator-header .tabulator-col .tabulator-col-content,
+.tabulator-row .tabulator-cell {
+  padding: 6px 8px !important;
+}
+
+.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title {
+  font-weight: 500 !important;
+}
+
+.tabulator-row .tabulator-cell:first-child {
+  border-left: 0 !important;
+}
+
+.tabulator-row {
+  border-bottom: 1px solid #e5e7eb !important;
+  min-height: 34px !important;
+}
+
+.tabulator .tabulator-footer {
+  background: #fff;
+  border-top-color: #d9dee7;
+  color: #4b5563;
+  font-weight: 500 !important;
+}
+
+#tabulator-download-csv {
+  font-weight: 500 !important;
+  text-transform: none !important;
+}
