@@ -2,6 +2,13 @@
 
 All notable changes to `savne-saltcorn-agent-api` are documented here.
 
+## 0.2.54 - 2026-07-17
+
+- Added public page creation support with explicit public role resolution.
+- Added advanced Saltcorn action/trigger discovery and trigger creation endpoints.
+- Added a webhook trigger shortcut for installations with a compatible webhook action.
+- Expanded the agent skill with database naming conventions and advanced automation safety guidance.
+
 ## 0.2.53 - 2026-07-16
 
 - Prepared the package for direct GitHub distribution.

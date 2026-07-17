@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Savne Saltcorn Agent API",
-    "version": "0.2.53",
+    "version": "0.2.54",
     "description": "Authenticated administrative API for operating Saltcorn safely from agents, scripts, and automation tools. All public endpoints are served under /savne-saltcorn-agent-api."
   },
   "servers": [
@@ -24,6 +24,7 @@
     { "name": "Views" },
     { "name": "Pages" },
     { "name": "Menus" },
+    { "name": "Automation" },
     { "name": "Maintenance" }
   ],
   "paths": {
@@ -164,6 +165,19 @@
         "tags": ["Discovery"],
         "summary": "List installed plugins and feature recipe availability",
         "operationId": "capabilities",
+        "responses": {
+          "200": { "$ref": "#/components/responses/GenericOk" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" }
+        }
+      }
+    },
+    "/savne-saltcorn-agent-api/actions": {
+      "get": {
+        "tags": ["Automation"],
+        "summary": "List Saltcorn actions, trigger events, and existing triggers",
+        "description": "Use this endpoint before creating triggers or webhooks. Action names and event names can vary by Saltcorn version and installed plugins.",
+        "operationId": "listActionsAndTriggers",
         "responses": {
           "200": { "$ref": "#/components/responses/GenericOk" },
           "401": { "$ref": "#/components/responses/Unauthorized" },
@@ -616,6 +630,20 @@
         }
       }
     },
+    "/savne-saltcorn-agent-api/pages/public": {
+      "post": {
+        "tags": ["Pages"],
+        "summary": "Create a public Saltcorn page",
+        "description": "Creates a page with public access by resolving the public/anonymous Saltcorn role. Defaults to dry_run unless dry_run is false.",
+        "operationId": "createPublicPage",
+        "requestBody": { "$ref": "#/components/requestBodies/PageRecipe" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/GenericOk" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" }
+        }
+      }
+    },
     "/savne-saltcorn-agent-api/menus/inspect": {
       "get": {
         "tags": ["Menus"],
@@ -651,6 +679,48 @@
           "content": {
             "application/json": {
               "schema": { "$ref": "#/components/schemas/AddPageToMenuRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/GenericOk" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" }
+        }
+      }
+    },
+    "/savne-saltcorn-agent-api/triggers": {
+      "post": {
+        "tags": ["Automation"],
+        "summary": "Create a Saltcorn trigger/action binding",
+        "description": "Creates a trigger after validating the requested Saltcorn event and action names. Defaults to dry_run unless dry_run is false.",
+        "operationId": "createTrigger",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateTriggerRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/GenericOk" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" }
+        }
+      }
+    },
+    "/savne-saltcorn-agent-api/triggers/webhook": {
+      "post": {
+        "tags": ["Automation"],
+        "summary": "Create a webhook trigger",
+        "description": "Creates a trigger using an installed webhook action. Call GET /savne-saltcorn-agent-api/actions first if the available action name is unknown.",
+        "operationId": "createWebhookTrigger",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateWebhookTriggerRequest" }
             }
           }
         },
@@ -1308,6 +1378,82 @@
               "icon": { "type": "string" },
               "min_role": { "type": ["integer", "string"] },
               "order": { "type": "integer" }
+            },
+            "additionalProperties": true
+          }
+        ]
+      },
+      "CreateTriggerRequest": {
+        "allOf": [
+          { "$ref": "#/components/schemas/DryRun" },
+          {
+            "type": "object",
+            "required": ["name", "event", "action"],
+            "properties": {
+              "name": { "type": "string" },
+              "event": {
+                "type": "string",
+                "description": "Saltcorn trigger event, for example Insert, Update, Delete, Validate, or API call. Call GET /savne-saltcorn-agent-api/actions first."
+              },
+              "when_trigger": { "type": "string" },
+              "action": {
+                "type": "string",
+                "description": "Installed Saltcorn action name. Call GET /savne-saltcorn-agent-api/actions first."
+              },
+              "table": {
+                "type": "string",
+                "description": "Required for table events such as Insert, Update, Delete, and Validate."
+              },
+              "description": { "type": "string" },
+              "channel": { "type": "string" },
+              "min_role": { "type": ["integer", "string"] },
+              "configuration": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "allow_unknown_action": { "type": "boolean" },
+              "allow_unknown_event": { "type": "boolean" }
+            },
+            "additionalProperties": true
+          }
+        ]
+      },
+      "CreateWebhookTriggerRequest": {
+        "allOf": [
+          { "$ref": "#/components/schemas/DryRun" },
+          {
+            "type": "object",
+            "required": ["name", "event"],
+            "properties": {
+              "name": { "type": "string" },
+              "event": {
+                "type": "string",
+                "description": "Saltcorn trigger event, for example Insert, Update, Delete, Validate, or API call. Call GET /savne-saltcorn-agent-api/actions first."
+              },
+              "when_trigger": { "type": "string" },
+              "action": {
+                "type": "string",
+                "description": "Optional installed webhook action name. If omitted, the endpoint tries to infer an action containing webhook."
+              },
+              "table": {
+                "type": "string",
+                "description": "Required for table events such as Insert, Update, Delete, and Validate."
+              },
+              "url": { "type": "string", "format": "uri" },
+              "webhook_url": { "type": "string", "format": "uri" },
+              "method": { "type": "string", "default": "POST" },
+              "headers": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "body": {},
+              "payload": {},
+              "body_template": {},
+              "payload_template": {},
+              "configuration": {
+                "type": "object",
+                "additionalProperties": true
+              }
             },
             "additionalProperties": true
           }

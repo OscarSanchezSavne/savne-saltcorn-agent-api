@@ -14,7 +14,10 @@ const {
   createFormLayoutView,
   createKeyRelation,
   createManyToManyRelation,
+  createPublicPage,
   createRecordWithRelationsPage,
+  createTrigger,
+  createWebhookTrigger,
   createKanbanView,
   createPage,
   createRows,
@@ -26,6 +29,7 @@ const {
   inspectMenu,
   inspectPages,
   inspectViews,
+  listActionsAndTriggers,
   listFieldCapabilities,
   listViewTemplates,
   refreshCaches,
@@ -104,6 +108,13 @@ const commands = [
     method: "GET",
     url: "/savne-saltcorn-agent-api/capabilities",
     description: "Lists installed plugins, available viewtemplates, and validated feature recipes.",
+    destructive: false,
+  },
+  {
+    name: "actions",
+    method: "GET",
+    url: "/savne-saltcorn-agent-api/actions",
+    description: "Lists available Saltcorn actions, trigger event types, and existing triggers.",
     destructive: false,
   },
   {
@@ -247,6 +258,13 @@ const commands = [
     destructive: true,
   },
   {
+    name: "create_public_page",
+    method: "POST",
+    url: "/savne-saltcorn-agent-api/pages/public",
+    description: "Creates a Saltcorn page with public access. Defaults to dry_run unless dry_run is false.",
+    destructive: true,
+  },
+  {
     name: "create_crud_page",
     method: "POST",
     url: "/savne-saltcorn-agent-api/pages/crud",
@@ -286,6 +304,20 @@ const commands = [
     method: "POST",
     url: "/savne-saltcorn-agent-api/menus/add-page",
     description: "Adds or moves a page menu item, optionally inside a Header group. Defaults to dry_run.",
+    destructive: true,
+  },
+  {
+    name: "create_trigger",
+    method: "POST",
+    url: "/savne-saltcorn-agent-api/triggers",
+    description: "Creates a Saltcorn trigger/action binding after validating available event and action names. Defaults to dry_run.",
+    destructive: true,
+  },
+  {
+    name: "create_webhook_trigger",
+    method: "POST",
+    url: "/savne-saltcorn-agent-api/triggers/webhook",
+    description: "Creates a Saltcorn trigger using an installed webhook action. Defaults to dry_run.",
     destructive: true,
   },
 ];
@@ -377,6 +409,8 @@ const fieldCapabilities = async () => listFieldCapabilities();
 
 const capabilities = async () => getCapabilities();
 
+const actions = async () => listActionsAndTriggers();
+
 const onLoad = async () => {
   console.log(`[${pluginName}] onLoad ${pluginVersion} with ${routes.length} routes`);
   const stateModule = optionalRequire("@saltcorn/data/db/state");
@@ -400,6 +434,7 @@ const routeDefinitions = [
   ["get", `/${pluginName}/viewtemplates`, viewtemplates],
   ["get", `/${pluginName}/fields/capabilities`, fieldCapabilities],
   ["get", `/${pluginName}/capabilities`, capabilities],
+  ["get", `/${pluginName}/actions`, actions],
   ["post", `/${pluginName}/validate`, validate],
   [
     "post",
@@ -479,6 +514,7 @@ const routeDefinitions = [
     (req) => createRecordWithRelationsPage(req.body || {}),
   ],
   ["post", `/${pluginName}/pages/inspect`, (req) => inspectPages(req.body || {})],
+  ["post", `/${pluginName}/pages/public`, (req) => createPublicPage(req.body || {})],
   ["post", `/${pluginName}/pages`, (req) => createPage(req.body || {})],
   ["get", `/${pluginName}/menus/inspect`, inspectMenu],
   ["post", `/${pluginName}/menus/upsert`, (req) => upsertMenu(req.body || {})],
@@ -486,6 +522,12 @@ const routeDefinitions = [
     "post",
     `/${pluginName}/menus/add-page`,
     (req) => addPageToMenu(req.body || {}),
+  ],
+  ["post", `/${pluginName}/triggers`, (req) => createTrigger(req.body || {})],
+  [
+    "post",
+    `/${pluginName}/triggers/webhook`,
+    (req) => createWebhookTrigger(req.body || {}),
   ],
 ];
 
@@ -530,6 +572,7 @@ const plugin = {
     viewtemplates,
     fieldCapabilities,
     capabilities,
+    actions,
     requireCapabilities,
     refreshCaches,
     getLocaleSettings,
@@ -540,7 +583,10 @@ const plugin = {
     createAttachmentView,
     createKeyRelation,
     createManyToManyRelation,
+    createPublicPage,
     createRecordWithRelationsPage,
+    createTrigger,
+    createWebhookTrigger,
     createRows,
     createBasicViews,
     createFormLayoutView,
@@ -550,6 +596,7 @@ const plugin = {
     createChartView,
     createKanbanView,
     inspectViews,
+    listActionsAndTriggers,
     createCrudPage,
     inspectPages,
     createPage,

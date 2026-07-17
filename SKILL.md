@@ -96,7 +96,8 @@ anything:
 4. `GET /savne-saltcorn-agent-api/capabilities`
 5. `GET /savne-saltcorn-agent-api/fields/capabilities`
 6. `GET /savne-saltcorn-agent-api/viewtemplates`
-7. `GET /savne-saltcorn-agent-api/menus/inspect` when changing navigation
+7. `GET /savne-saltcorn-agent-api/actions` when creating triggers, actions, or webhooks
+8. `GET /savne-saltcorn-agent-api/menus/inspect` when changing navigation
 
 Use `/savne-saltcorn-agent-api/openapi.json` as the contract source for endpoint
 names, security, request bodies, dry-run behavior, and response shapes. Do not
@@ -142,9 +143,14 @@ Use this order unless the user asks for a narrow edit:
 ## Naming And Language
 
 - Keep internal table and field names stable, ASCII, lowercase, and snake_case.
+- For new apps, default internal table names to English plural nouns:
+  `products`, `employees`, `purchase_orders`, `survey_responses`.
+- Use Saltcorn's normal serial `id` primary key. Do not add a second id field unless the user asks.
+- For foreign keys, default to the referenced table singular plus `_id`:
+  `product_id`, `employee_id`, `supplier_id`, `purchase_order_id`.
 - Use user-facing labels in the requested language.
 - For Spanish apps, use labels such as `Crear`, `Guardar`, `Editar`, `Eliminar`, `Productos`, `Proveedor`, `Calendario`.
-- Do not rename internal table names just to translate UI labels.
+- Do not rename existing internal table or field names to match this convention unless the user explicitly asks.
 
 ## Tables
 
@@ -158,12 +164,12 @@ Minimal pattern:
 
 ```json
 {
-  "name": "productos",
+  "name": "products",
   "label": "Productos",
   "fields": [
-    { "name": "codigo", "label": "Codigo", "type": "String", "required": true, "unique": true },
-    { "name": "nombre", "label": "Nombre", "type": "String", "required": true },
-    { "name": "activo", "label": "Activo", "type": "Bool" }
+    { "name": "code", "label": "Codigo", "type": "String", "required": true, "unique": true },
+    { "name": "name", "label": "Nombre", "type": "String", "required": true },
+    { "name": "active", "label": "Activo", "type": "Bool" }
   ],
   "dry_run": true
 }
@@ -190,12 +196,12 @@ Key relation field:
 
 ```json
 {
-  "table": "productos",
-  "name": "proveedor",
+  "table": "products",
+  "name": "supplier_id",
   "label": "Proveedor",
   "type": "Key",
-  "reftable_name": "proveedores",
-  "summary_field": "nombre",
+  "reftable_name": "suppliers",
+  "summary_field": "name",
   "dry_run": true
 }
 ```
@@ -475,6 +481,22 @@ Use `POST /savne-saltcorn-agent-api/pages/record-with-relations` for a master-de
 }
 ```
 
+Use `POST /savne-saltcorn-agent-api/pages/public` for public pages such as surveys, landing pages, or read-only public forms. Public pages still require an admin token to create; only the resulting Saltcorn page is public.
+
+```json
+{
+  "name": "employee_survey",
+  "title": "Encuesta",
+  "layout": {
+    "above": [
+      { "type": "view", "view": "Formulario encuesta publica", "state": "shared", "configuration": {} }
+    ]
+  },
+  "public": true,
+  "dry_run": true
+}
+```
+
 ## Menus
 
 Inspect before changing menus:
@@ -496,6 +518,56 @@ Prefer adding pages with `POST /savne-saltcorn-agent-api/menus/add-page`:
 ```
 
 Use `menus/upsert` only when intentionally replacing or restructuring a known menu group. Preserve native Saltcorn admin menu items unless the user explicitly asks to hide them.
+
+## Advanced Automation
+
+Use Saltcorn triggers/actions/hooks only for explicit advanced business logic.
+Always inspect available actions first:
+
+```http
+GET /savne-saltcorn-agent-api/actions
+```
+
+Use `POST /savne-saltcorn-agent-api/triggers` to create a generic Saltcorn
+trigger. The `event` and `action` values must come from the `actions` endpoint
+unless the user explicitly accepts unknown names.
+
+```json
+{
+  "name": "validate_employee_survey",
+  "table": "survey_responses",
+  "event": "Validate",
+  "action": "Run JavaScript code",
+  "configuration": {
+    "code": "/* validate employee_id and duplicate response here */"
+  },
+  "dry_run": true
+}
+```
+
+Use `POST /savne-saltcorn-agent-api/triggers/webhook` only when an installed
+webhook action exists. Prefer `dry_run:true` first and show the plan to the
+user before enabling `dry_run:false`.
+
+```json
+{
+  "name": "notify_new_survey_response",
+  "table": "survey_responses",
+  "event": "Insert",
+  "url": "https://example.com/webhook",
+  "method": "POST",
+  "dry_run": true
+}
+```
+
+For public survey flows:
+
+- Create the public page/form with `/pages/public`.
+- Store responses in a normal table such as `survey_responses`.
+- Validate employee existence, duplicate submissions, or external notifications
+  with explicit Saltcorn triggers/actions after inspecting `/actions`.
+- Do not add hidden validation or external webhooks unless the user asks for
+  that logic specifically.
 
 ## Explicit Deletion Only
 
