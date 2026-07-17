@@ -18,10 +18,47 @@ Use this skill to build or modify Saltcorn apps through the `savne-saltcorn-agen
 - Do not use fixed shared tokens, cookies, or direct Saltcorn internal table writes.
 - Prefer Saltcorn-native tables, fields, views, pages, menus, and layout components.
 - Use small HTML snippets only for headings, helper text, or unavoidable layout polish.
+- Treat every Saltcorn instance as a real business system. Read-only discovery is
+  safe; modifying data or components is not.
+- Do not create, update, delete, rename, move, or overwrite rows, tables, fields,
+  views, pages, menus, files, roles, plugins, or configuration unless the user
+  explicitly asks for that specific change.
 - Run destructive operations only on explicit named objects requested by the user.
 - Never call or recreate broad cleanup behavior. There is no safe "delete everything" workflow.
 - Default to `dry_run: true` for write planning; execute with `dry_run: false` only after the plan is reasonable.
 - After creating or updating views/pages/menus, call `/savne-saltcorn-agent-api/refresh`.
+
+## Enterprise Safety
+
+Assume Saltcorn is backing an operational company system. Be conservative:
+
+- If the user asks to inspect, analyze, list, review, or understand something,
+  use only read endpoints.
+- If the user asks for a broad goal such as "fix this app", "make it better",
+  "clean this up", or "prepare a demo", inspect first and propose a dry-run
+  plan. Do not apply changes until the user agrees.
+- If an operation may affect existing business data or navigation, name the
+  exact objects to be changed before using `dry_run:false`.
+- Never infer permission to delete or overwrite from context. Deletion,
+  replacement, menu restructuring, and table/field changes require explicit
+  user wording and explicit object names.
+- Preserve existing Saltcorn admin/navigation items unless the user explicitly
+  asks to change them.
+
+## Credentials
+
+Use values already provided by the user or visible in the current environment.
+Do not assume they exist as shell environment variables.
+
+If `<SALTCORN_BASE_URL>` or `<SALTCORN_USER_TOKEN>` is unknown, ask the user for
+the missing value before calling the API. If the user does not know how to get
+them, guide them:
+
+- Base URL: open Saltcorn in the browser and copy the origin, including protocol
+  and port, such as `http://10.0.100.4:3000`.
+- User token: log in as an admin Saltcorn user, open the user/profile or
+  users/security area, and create or copy a user API token. The token must
+  belong to an admin user for administrative operations.
 
 ## Request Pattern
 
@@ -29,16 +66,6 @@ Use this skill to build or modify Saltcorn apps through the `savne-saltcorn-agen
 `http://localhost:3000` or `http://10.0.100.4:3000`. Do not append plugin paths
 to the base URL. `<SALTCORN_USER_TOKEN>` is a native Saltcorn user API token.
 These are placeholders in examples, not required environment variable names.
-
-If the base URL or token is not known from the conversation or environment, ask
-the user for them before calling the API. If the user does not know how to get
-them, guide them:
-
-- Base URL: open Saltcorn in the browser and copy the origin, including protocol
-  and port, such as `http://10.0.100.4:3000`.
-- User token: log in as an admin Saltcorn user and create/copy a user API token
-  from Saltcorn's user/API-key settings. The token must belong to an admin user
-  for administrative operations.
 
 For GET requests:
 
